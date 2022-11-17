@@ -7,13 +7,7 @@ export type TheHeaderProps = {};
 
 export const TheHeader: FC<TheHeaderProps> = () => {
   return (
-    <Flex
-      width="550px"
-      height="65px"
-      background={theme.colors.black}
-      pl="20px"
-      gap="10px"
-    >
+    <Flex height="65px" background={theme.colors.black} pl="20px" gap="10px">
       <Image
         height="65px"
         width="65px"
