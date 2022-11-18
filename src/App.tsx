@@ -1,9 +1,23 @@
-import { Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+
+import { TheHeader } from "./components/TheHeader";
+import { InputForm } from "./components/InputFrom";
+
+import { theme } from "./styles/theme";
+import "./styles/fonts.css";
 
 export const App = () => {
   return (
-    <Box textAlign="center" fontSize="xl">
-      Hello
-    </Box>
+    <Flex
+      flexDir="column"
+      width="550px"
+      background={theme.colors.white}
+      fontFamily="'Kalam', cursive"
+      color={theme.colors.black}
+      overflow="clip"
+    >
+      <TheHeader />
+      <InputForm />
+    </Flex>
   );
 };
