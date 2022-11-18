@@ -1,14 +1,14 @@
 import { Button, Grid, Input, Image, Flex, Text } from "@chakra-ui/react";
-import { ChangeEvent, FC, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
 
 import { theme } from "../styles/theme";
 import "../styles/fonts.css";
-import memesData from "../memesData";
 
 export type InputFormProps = {};
 
 export const Form = (props: {
   label: string;
+  top: boolean;
   onChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void;
 }) => {
   return (
@@ -19,6 +19,7 @@ export const Form = (props: {
       border="1px solid #d3af37"
       textAlign="center"
       placeholder={props.label}
+      name={props.top ? "topText" : "bottomText"}
     />
   );
 };
@@ -47,38 +48,41 @@ export const MemeText = (props: { text: string; top: boolean }) => {
 };
 
 export const InputForm: FC<InputFormProps> = () => {
-  const [topInput, setTopInput] = useState<string>("");
-  const [bottomInput, setBottomInput] = useState<string>("");
   const [meme, setMeme] = useState<{
     url: string;
     topText: string;
     bottomText: string;
   }>({
-    url: "https://i.imgflip.com/1e7ql7.jpg",
+    url: "",
     topText: "Top Text",
     bottomText: "Bottom Text",
   });
+  const [allMemes, setAllMemes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("https://api.imgflip.com/get_memes");
+      const data = await res.json();
+      setAllMemes(data.data.memes);
+    };
+    fetchData();
+  }, []);
 
   const getMemeImage = () => {
-    if (topInput === "" || bottomInput === "") {
-      alert("The value is empty.");
-      return;
-    }
-    const memesArray = memesData.data.memes;
-    const randomNumber = Math.floor(Math.random() * memesArray.length);
-    setMeme({
-      url: memesArray[randomNumber].url,
-      topText: topInput,
-      bottomText: bottomInput,
-    });
+    const randomNumber: number = Math.floor(Math.random() * allMemes.length);
+    const url: string = allMemes[randomNumber].url;
+    setMeme((prevMeme) => ({
+      ...prevMeme,
+      url: url,
+    }));
   };
 
-  const changeTopText = (event: ChangeEvent<HTMLInputElement>) => {
-    setTopInput(event.target.value);
-  };
-
-  const changeBottomText = (event: ChangeEvent<HTMLInputElement>) => {
-    setBottomInput(event.target.value);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setMeme((prevMeme) => ({
+      ...prevMeme,
+      [name]: value,
+    }));
   };
 
   return (
@@ -89,8 +93,8 @@ export const InputForm: FC<InputFormProps> = () => {
         margin="36px"
         marginBottom="0px"
       >
-        <Form label="Top Text" onChangeHandler={changeTopText} />
-        <Form label="Bottom Text" onChangeHandler={changeBottomText} />
+        <Form label="Top Text" onChangeHandler={handleChange} top={true} />
+        <Form label="Bottom Text" onChangeHandler={handleChange} top={false} />
         <Button
           fontFamily="'Kalam', cursive"
           borderRadius="5px"
@@ -98,6 +102,7 @@ export const InputForm: FC<InputFormProps> = () => {
           color={theme.colors.white}
           background={theme.colors.black}
           gridColumn="1/-1"
+          cursor="pointer"
           onClick={getMemeImage}
         >
           Get a new meme image 🖼
